@@ -1,1 +1,13 @@
+在安装完 nginx 后，无法启动Nginx 服务 ，提示：
 
+"Job for nginx.service failed because the control process exited with error code. See "systemctl status nginx.service" and "journalctl -xe" for details."
+
+查看 日志文件： /var/log/nginx  也可以发现: "0.0.0.0:80 failed (98: Address already in use)" 这是80端口被占用 导致 Nginx 起不来
+
+解决方法为：
+
+fuser -k 80/tcp
+
+systemctl restart nginx
+
+问题得到解决。
