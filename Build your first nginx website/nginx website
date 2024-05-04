@@ -1,0 +1,49 @@
+安装 nginx
+
+yum install nginx -y
+
+开启防火墙80 端口
+
+firewall-cmd --add-port=80/tcp --permanent
+
+启动nginx 服务
+
+systemctl start nginx
+
+开机启动nginx 服务
+
+systemctl enable nginx
+
+*********************************
+
+修改 index.html 文件
+
+cd /usr/share/nginx/html 
+
+mv index.html index.html.bak
+
+vim index.html
+
+写上以下 html 代码：
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>A pengchao's website test file</title>
+</head>
+<body>
+
+<h2 style="color: green">welcome to the world of nginx!!</h2>
+<p style="color: blue">If you can't fly then you can run, if you can't run , then you can walk, if you can't walk then you can climb, all you need to do is to realize your dream!!
+</p>
+
+<h1 style="color: red">martin luther king</h1>
+<img src="img/doctorking.jpg" alt="king" width="500" height="600"
+
+<p>Designed by pengchao in 2024, all rights reserved</p>
+
+</body>
+</html>
+
+接下来测试网站，已经正常运行了
+
