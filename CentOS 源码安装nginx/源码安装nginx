@@ -1,0 +1,110 @@
+首先更新下系统包
+
+yum update -y
+
+安装相应的工具
+
+yum -y install gcc gcc-c++ make zlib-devel pcre-devel openssl-devel
+
+下载nginx 的源码 （可以去nginx.org 官网下载源码）
+
+wget https://nginx.org/download/nginx-1.8.1.tar.gz
+
+解压nginx的源码包
+
+tat -xvf nginx-1.8.1.tar.gz
+
+进入nginx源码包 查看文件
+
+cd nginx-1.8.1
+
+编译 nginx 源码包：
+
+ ./configure --user=nginx --group=nginx --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --with-http_ssl_module --with-pcre
+
+安装
+make 
+make install
+
+or make & make install
+
+创建系统用户nginx 并设置家目录 和nolgoin 
+
+useradd -d /etc/nginx/ -s /sbin/nologin nginx
+
+修改nginx 配置文件
+
+vim /etc/nginx/nginx.conf
+
+只需修改两处：
+将 user nobody 改为 user nginx;
+location 那里也进行修改 添加： /var/www/html
+
+user nginx;
+location / {
+                root /var/www/html;
+                autoindex on;
+                index index.html index.htm;
+
+
+创建 文件夹 html
+
+make -p /var/www/html
+
+启动 nginx
+
+/usr/sbin/nginx
+
+查看nginx的 tcp 连接
+
+netstat -tulpn | grep nginx
+
+防火墙端口设置：
+
+# firewall-cmd --permanent --add-service=http
+# firewall-cmd --permanent --add-service=https
+# systemctl restart firewalld
+
+nginx 服务的一些命令格式：
+
+# /usr/sbin/nginx -V         [show Nginx modules and configurations]
+# /usr/sbin/nginx -h         [help options]
+# /usr/sbin/nginx -t         [check configuration file]
+# /usr/sbin/nginx            [start Nginx process]
+# /usr/sbin/nginx -s stop    [stop Nginx process]
+# /usr/sbin/nginx -s reload  [reload Nginx process]
+
+修改文件 用systemctl 来控制 Nginx:
+
+vim /lib/systemd/system/nginx.service
+
+编辑添加一下代码：
+
+[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/run/nginx.pid
+ExecStartPre=/usr/sbin/nginx -t
+ExecStart=/usr/sbin/nginx
+ExecReload=/usr/sbin/nginx -s reload
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
+
+这样就可以使用：
+
+systemctl status nginx  ----- 查看nginx 的状态
+systemctl restart nginx ----- 重启 nginx 服务
+systemctl start nginx --------开启nginx 服务
+systemctl stop nginx ---------停止nginx 服务
+
+
+
+
